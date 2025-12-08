@@ -15,10 +15,17 @@ import {
 } from "recharts"
 import { Download, Calendar, BarChart3, ChevronLeft, ChevronRight } from "lucide-react"
 
-export default function AnalyticsPage({ subscriptions, totalSpend, darkMode, mode = "individual" }) {
+interface AnalyticsPageProps {
+  subscriptions: any[]
+  totalSpend: number
+  darkMode?: boolean
+  mode?: string
+}
+
+export default function AnalyticsPage({ subscriptions, totalSpend, darkMode, mode = "individual" }: AnalyticsPageProps) {
   const [view, setView] = useState("default") // 'default', 'calendar', 'comparison'
   const [currentMonth, setCurrentMonth] = useState(new Date())
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [comparisonYear, setComparisonYear] = useState(new Date().getFullYear())
 
   const weeklyPerformance = [
@@ -40,8 +47,8 @@ export default function AnalyticsPage({ subscriptions, totalSpend, darkMode, mod
     { month: "Dec", spend: 67 },
   ]
 
-  const categorySpend = subscriptions.reduce((acc, sub) => {
-    const existing = acc.find((item) => item.name === sub.category)
+  const categorySpend = subscriptions.reduce((acc: Array<{ name: string; value: number }>, sub: any) => {
+    const existing = acc.find((item: { name: string; value: number }) => item.name === sub.category)
     if (existing) {
       existing.value += sub.price
     } else {
@@ -141,7 +148,7 @@ export default function AnalyticsPage({ subscriptions, totalSpend, darkMode, mod
     }
   }
 
-  const getSimilarTools = (category) => {
+  const getSimilarTools = (category: string) => {
     return subscriptions.filter((sub) => sub.category === category)
   }
 
@@ -170,7 +177,7 @@ export default function AnalyticsPage({ subscriptions, totalSpend, darkMode, mod
     return days
   }
 
-  const getRenewalsForDate = (day) => {
+  const getRenewalsForDate = (day: number | null) => {
     if (!day) return []
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()

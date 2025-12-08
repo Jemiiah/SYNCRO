@@ -1,5 +1,5 @@
 export function detectDuplicates(subscriptions: any[]) {
-  const duplicates = []
+  const duplicates: any[] = []
   const subscriptionGroups: Record<string, any[]> = {}
 
   subscriptions.forEach((sub) => {

@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react"
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Mail, Zap, Plus, X } from "lucide-react"
 
-export default function OnboardingModal({ onClose, onModeSelect, darkMode = false }) {
+interface OnboardingModalProps {
+  onClose: () => void
+  onModeSelect: (mode: "individual" | "enterprise") => void
+  darkMode?: boolean
+}
+
+export default function OnboardingModal({ onClose, onModeSelect, darkMode = false }: OnboardingModalProps) {
   const [step, setStep] = useState(1)
   const [connectionMethod, setConnectionMethod] = useState<"gmail" | "manual" | null>(null)
   const [isScanning, setIsScanning] = useState(false)

@@ -3,9 +3,15 @@
 import { useState } from "react"
 import ManageIntegrationModal from "@/components/modals/manage-integration-modal"
 
-export default function IntegrationsPage({ integrations, onToggle, darkMode }) {
+interface IntegrationsPageProps {
+  integrations: any[]
+  onToggle: (id: number) => void
+  darkMode?: boolean
+}
+
+export default function IntegrationsPage({ integrations, onToggle, darkMode }: IntegrationsPageProps) {
   const [sortBy, setSortBy] = useState("name")
-  const [selectedIntegration, setSelectedIntegration] = useState(null)
+  const [selectedIntegration, setSelectedIntegration] = useState<any>(null)
   const [showManageModal, setShowManageModal] = useState(false)
 
   const supportedTools = [
@@ -32,7 +38,7 @@ export default function IntegrationsPage({ integrations, onToggle, darkMode }) {
     return 0
   })
 
-  const handleManageIntegration = (integration) => {
+  const handleManageIntegration = (integration: any) => {
     setSelectedIntegration(integration)
     setShowManageModal(true)
   }

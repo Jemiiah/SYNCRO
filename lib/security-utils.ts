@@ -154,19 +154,19 @@ export class SessionManager {
     if (this.warningTimeoutId) clearTimeout(this.warningTimeoutId)
   }
 
+  private resetTimer = () => {
+    const now = Date.now()
+    if (now - this.lastActivity > 1000) {
+      // Throttle to once per second
+      this.lastActivity = now
+      this.startTimer()
+    }
+  }
+
   private setupActivityListeners(): void {
     const events = ["mousedown", "keydown", "scroll", "touchstart"]
-    const resetTimer = () => {
-      const now = Date.now()
-      if (now - this.lastActivity > 1000) {
-        // Throttle to once per second
-        this.lastActivity = now
-        this.startTimer()
-      }
-    }
-
     events.forEach((event) => {
-      window.addEventListener(event, resetTimer, { passive: true })
+      window.addEventListener(event, this.resetTimer, { passive: true })
     })
   }
 
@@ -176,6 +176,15 @@ export class SessionManager {
 
   destroy(): void {
     this.clearTimers()
+    const events = ["mousedown", "keydown", "scroll", "touchstart"]
+    events.forEach((event) => {
+      window.removeEventListener(event, this.resetTimer)
+    })
+  }
+
+  getTimeUntilTimeout(): number {
+    const elapsed = Date.now() - this.lastActivity
+    return Math.max(0, this.timeout - elapsed)
   }
 }
 

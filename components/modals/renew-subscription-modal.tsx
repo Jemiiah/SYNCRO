@@ -2,7 +2,13 @@
 
 import { X, ArrowRight } from "lucide-react"
 
-export default function RenewSubscriptionModal({ subscription, onClose, onRenew }) {
+interface RenewSubscriptionModalProps {
+  subscription: any
+  onClose: () => void
+  onRenew: () => void
+}
+
+export default function RenewSubscriptionModal({ subscription, onClose, onRenew }: RenewSubscriptionModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-2xl p-8 max-w-md w-full">

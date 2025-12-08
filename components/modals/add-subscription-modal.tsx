@@ -3,7 +3,16 @@
 import { useState } from "react"
 import { X, Search, Plus } from "lucide-react"
 
-const allSubscriptions = [
+interface SubscriptionTool {
+  name: string
+  category: string
+  subcategory: string
+  price: number
+  logo?: string
+  tags: string[]
+}
+
+const allSubscriptions: SubscriptionTool[] = [
   // AI Tools
   {
     name: "ChatGPT Plus",
@@ -309,12 +318,19 @@ const allSubscriptions = [
   },
 ]
 
-export default function AddSubscriptionModal({ onAdd, onClose, darkMode }) {
+export default function AddSubscriptionModal({ onAdd, onClose, darkMode }: { onAdd: (subscription: any) => void; onClose: () => void; darkMode?: boolean }) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedTool, setSelectedTool] = useState(null)
+  const [selectedTool, setSelectedTool] = useState<SubscriptionTool | null>(null)
   const [customMode, setCustomMode] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState("All")
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string
+    category: string
+    subcategory: string
+    price: string
+    logo: string
+    tags: string[]
+  }>({
     name: "",
     category: "AI Tools",
     subcategory: "",
@@ -344,20 +360,33 @@ export default function AddSubscriptionModal({ onAdd, onClose, darkMode }) {
     return matchesSearch && matchesCategory
   })
 
-  const handleSelectTool = (tool) => {
+  const handleSelectTool = (tool: SubscriptionTool) => {
     setSelectedTool(tool)
     setFormData({
       name: tool.name,
       category: tool.category,
       subcategory: tool.subcategory,
       price: tool.price.toString(),
-      logo: tool.logo,
+      logo: tool.logo || "",
       tags: tool.tags,
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (formData.name && formData.price) {
+      onAdd({
+        ...formData,
+        price: Number.parseFloat(formData.price),
+        renewsIn: 30,
+        status: "active",
+        icon: formData.logo ? "🔗" : "🎨",
+        color: "#000000",
+      })
+    }
+  }
+
+  const handleButtonSubmit = () => {
     if (formData.name && formData.price) {
       onAdd({
         ...formData,
@@ -550,7 +579,7 @@ export default function AddSubscriptionModal({ onAdd, onClose, darkMode }) {
             <button
               onClick={
                 customMode
-                  ? handleSubmit
+                  ? handleButtonSubmit
                   : () =>
                       selectedTool &&
                       onAdd({

@@ -2,7 +2,13 @@
 
 import { X, TrendingUp, AlertCircle, Lightbulb } from "lucide-react"
 
-export default function InsightsModal({ insights, totalSpend, onClose }) {
+interface InsightsModalProps {
+  insights: any[]
+  totalSpend: number
+  onClose: () => void
+}
+
+export default function InsightsModal({ insights, totalSpend, onClose }: InsightsModalProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-96 overflow-y-auto">

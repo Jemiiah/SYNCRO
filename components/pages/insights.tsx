@@ -2,7 +2,14 @@
 
 import { TrendingUp, AlertCircle, Lightbulb, ArrowLeft } from "lucide-react"
 
-export default function InsightsPage({ insights, totalSpend, onClose, darkMode }) {
+interface InsightsPageProps {
+  insights: any[]
+  totalSpend: number
+  onClose: () => void
+  darkMode?: boolean
+}
+
+export default function InsightsPage({ insights, totalSpend, onClose, darkMode }: InsightsPageProps) {
   return (
     <div className={`min-h-screen ${darkMode ? "bg-[#1E2A35]" : "bg-[#F9F6F2]"}`}>
       {/* Header */}

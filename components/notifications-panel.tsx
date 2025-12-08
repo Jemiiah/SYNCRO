@@ -14,6 +14,15 @@ import {
 } from "lucide-react"
 import { EmptyState } from "@/components/ui/empty-state"
 
+interface NotificationsPanelProps {
+  notifications: any[]
+  onMarkRead: (id: number) => void
+  onClose: () => void
+  onAddSubscription: (subscription: any) => void
+  onResolveAction: (action: string, data: any) => void
+  darkMode?: boolean
+}
+
 export default function NotificationsPanel({
   notifications,
   onMarkRead,
@@ -21,8 +30,8 @@ export default function NotificationsPanel({
   onAddSubscription,
   darkMode,
   onResolveAction,
-}) {
-  const getNotificationIcon = (type) => {
+}: NotificationsPanelProps) {
+  const getNotificationIcon = (type: string) => {
     const iconClass = "w-5 h-5"
     switch (type) {
       case "duplicate":

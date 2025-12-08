@@ -3,6 +3,20 @@
 import { ArrowRight, Mail, Sparkles, Package } from "lucide-react"
 import { useState } from "react"
 
+interface DashboardPageProps {
+  subscriptions: any[]
+  totalSpend: number
+  insights: any[]
+  onViewInsights: () => void
+  onRenew: (subscription: any) => void
+  onManage: (subscription: any) => void
+  darkMode?: boolean
+  emailAccounts?: any[]
+  duplicates?: any[]
+  unusedSubscriptions?: any[]
+  trialSubscriptions?: any[]
+}
+
 export default function DashboardPage({
   subscriptions,
   totalSpend,
@@ -15,7 +29,7 @@ export default function DashboardPage({
   duplicates,
   unusedSubscriptions,
   trialSubscriptions,
-}) {
+}: DashboardPageProps) {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [filterEmail, setFilterEmail] = useState("all")
   const [filterType, setFilterType] = useState("all")
@@ -273,7 +287,7 @@ export default function DashboardPage({
                           </p>
                           <div className="flex items-center justify-between">
                             <span className={`text-xs ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-                              Last used: {Math.floor((new Date() - sub.lastUsedAt) / (1000 * 60 * 60 * 24))} days ago
+                              Last used: {Math.floor((new Date().getTime() - new Date(sub.lastUsedAt).getTime()) / (1000 * 60 * 60 * 24))} days ago
                             </span>
                             <span className={`text-xs font-semibold ${darkMode ? "text-[#007A5C]" : "text-green-600"}`}>
                               Active
@@ -293,7 +307,7 @@ export default function DashboardPage({
                       {sub.isTrial && sub.trialEndsAt && (
                         <div className="p-2 bg-[#007A5C]/10 rounded-lg">
                           <p className={`text-xs ${darkMode ? "text-[#007A5C]" : "text-green-700"}`}>
-                            Trial ends in {Math.ceil((sub.trialEndsAt - new Date()) / (1000 * 60 * 60 * 24))} days - $
+                            Trial ends in {Math.ceil((new Date(sub.trialEndsAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days - $
                             {sub.priceAfterTrial}/month after
                           </p>
                         </div>
@@ -419,7 +433,7 @@ export default function DashboardPage({
                       {sub.isTrial && sub.trialEndsAt && (
                         <div className="p-2 bg-[#007A5C]/10 rounded-lg">
                           <p className={`text-xs ${darkMode ? "text-[#007A5C]" : "text-green-700"}`}>
-                            Trial ends in {Math.ceil((sub.trialEndsAt - new Date()) / (1000 * 60 * 60 * 24))} days - $
+                            Trial ends in {Math.ceil((new Date(sub.trialEndsAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days - $
                             {sub.priceAfterTrial}/month after
                           </p>
                         </div>

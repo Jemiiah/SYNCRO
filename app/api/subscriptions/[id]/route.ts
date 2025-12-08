@@ -1,8 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = Number.parseInt(params.id)
+    const { id: idParam } = await params
+    const id = Number.parseInt(idParam)
 
     // In production, delete from database
     return NextResponse.json({ success: true, message: "Subscription deleted" })
@@ -11,9 +15,13 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = Number.parseInt(params.id)
+    const { id: idParam } = await params
+    const id = Number.parseInt(idParam)
     const body = await request.json()
 
     // In production, update in database

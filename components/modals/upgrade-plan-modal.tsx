@@ -3,7 +3,14 @@ import { X, Check, Copy, Wallet, CreditCard, Shield, Zap } from "lucide-react"
 import { useState, useEffect } from "react"
 import QRCode from "react-qr-code"
 
-function CryptoPaymentForm({ plan, onSuccess, onCancel, darkMode }) {
+interface CryptoPaymentFormProps {
+  plan: any
+  onSuccess: () => void
+  onCancel: () => void
+  darkMode?: boolean
+}
+
+function CryptoPaymentForm({ plan, onSuccess, onCancel, darkMode }: CryptoPaymentFormProps) {
   const [selectedToken, setSelectedToken] = useState("USDC")
   const [selectedChain, setSelectedChain] = useState("ethereum")
   const [copied, setCopied] = useState(false)
@@ -29,7 +36,7 @@ function CryptoPaymentForm({ plan, onSuccess, onCancel, darkMode }) {
     tron: "TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS",
   }
 
-  const currentWallet = walletAddresses[selectedChain]
+  const currentWallet = (walletAddresses as Record<string, string>)[selectedChain]
   const selectedChainData = chains.find((c) => c.id === selectedChain)
   const selectedTokenData = tokens.find((t) => t.id === selectedToken)
 
@@ -204,21 +211,28 @@ function CryptoPaymentForm({ plan, onSuccess, onCancel, darkMode }) {
   )
 }
 
-function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
+interface StripePaymentFormProps {
+  plan: any
+  onSuccess: () => void
+  onCancel: () => void
+  darkMode?: boolean
+}
+
+function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }: StripePaymentFormProps) {
   const [loading, setLoading] = useState(false)
   const [cardNumber, setCardNumber] = useState("")
   const [expiry, setExpiry] = useState("")
   const [cvc, setCvc] = useState("")
   const [name, setName] = useState("")
 
-  const formatCardNumber = (value) => {
+  const formatCardNumber = (value: string) => {
     return value
       .replace(/\s/g, "")
       .replace(/(\d{4})/g, "$1 ")
       .trim()
   }
 
-  const formatExpiry = (value) => {
+  const formatExpiry = (value: string) => {
     const cleaned = value.replace(/\D/g, "")
     if (cleaned.length >= 2) {
       return cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4)
@@ -226,7 +240,7 @@ function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
     return cleaned
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!cardNumber || !expiry || !cvc || !name) {
       alert("Please fill in all card details")
@@ -253,7 +267,7 @@ function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
           placeholder="4242 4242 4242 4242"
           value={cardNumber}
           onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-          maxLength="19"
+          maxLength={19}
           className={`w-full px-4 py-3 rounded-lg border-2 ${
             darkMode
               ? "bg-[#2D3748] border-[#374151] text-[#F9F6F2] focus:border-[#FFD166]"
@@ -291,7 +305,7 @@ function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
             placeholder="MM/YY"
             value={expiry}
             onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-            maxLength="5"
+            maxLength={5}
             className={`w-full px-4 py-3 rounded-lg border-2 ${
               darkMode
                 ? "bg-[#2D3748] border-[#374151] text-[#F9F6F2] focus:border-[#FFD166]"
@@ -308,7 +322,7 @@ function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
             placeholder="123"
             value={cvc}
             onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 3))}
-            maxLength="3"
+            maxLength={3}
             className={`w-full px-4 py-3 rounded-lg border-2 ${
               darkMode
                 ? "bg-[#2D3748] border-[#374151] text-[#F9F6F2] focus:border-[#FFD166]"
@@ -351,8 +365,23 @@ function StripePaymentForm({ plan, onSuccess, onCancel, darkMode }) {
   )
 }
 
-export default function UpgradePlanModal({ currentPlan, onUpgrade, onClose, darkMode }) {
-  const [selectedPlan, setSelectedPlan] = useState(null)
+interface UpgradePlanModalProps {
+  currentPlan: string
+  onUpgrade: (plan: string) => void
+  onClose: () => void
+  darkMode?: boolean
+}
+
+interface Plan {
+  name: string
+  displayName: string
+  price: number
+  features: string[]
+  popular?: boolean
+}
+
+export default function UpgradePlanModal({ currentPlan, onUpgrade, onClose, darkMode }: UpgradePlanModalProps) {
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<"stripe" | "crypto">("stripe")
 
   const plans = [

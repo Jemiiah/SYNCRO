@@ -15,7 +15,7 @@ export function detectPriceChanges(subscription: any): PriceChange | null {
     return null
   }
 
-  const history = subscription.priceHistory.sort((a, b) => b.date.getTime() - a.date.getTime())
+  const history = subscription.priceHistory.sort((a: any, b: any) => b.date.getTime() - a.date.getTime())
   const latest = history[0]
   const previous = history[1]
 

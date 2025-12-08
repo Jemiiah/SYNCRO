@@ -6,6 +6,21 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { VirtualizedList } from "@/components/ui/virtualized-list"
 import { EmptyState } from "@/components/ui/empty-state"
 
+interface SubscriptionsPageProps {
+  subscriptions?: any[]
+  onDelete: (id: number) => void
+  maxSubscriptions: number
+  currentPlan: string
+  darkMode?: boolean
+  onManage: (subscription: any) => void
+  onRenew: (subscription: any) => void
+  selectedSubscriptions: Set<number>
+  onToggleSelect: (id: number) => void
+  emailAccounts?: any[]
+  duplicates?: any[]
+  unusedSubscriptions?: any[]
+}
+
 export default function SubscriptionsPage({
   subscriptions = [],
   onDelete,
@@ -19,7 +34,7 @@ export default function SubscriptionsPage({
   emailAccounts = [],
   duplicates = [],
   unusedSubscriptions = [],
-}) {
+}: SubscriptionsPageProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   const [isSearching, setIsSearching] = useState(false)
@@ -30,8 +45,8 @@ export default function SubscriptionsPage({
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
   const [showUnusedOnly, setShowUnusedOnly] = useState(false)
 
-  const emailAccountsList = ["all", ...new Set((subscriptions || []).map((s) => s.email).filter(Boolean))]
-  const categories = ["all", ...new Set((subscriptions || []).map((s) => s.category))]
+  const emailAccountsList = ["all", ...new Set((subscriptions || []).map((s: any) => s.email).filter(Boolean))]
+  const categories = ["all", ...new Set((subscriptions || []).map((s: any) => s.category))]
   const statuses = ["all", "active", "trial", "expiring", "expired"]
 
   useEffect(() => {
@@ -42,19 +57,19 @@ export default function SubscriptionsPage({
     }
   }, [searchTerm, debouncedSearchTerm])
 
-  const filtered = (subscriptions || []).filter((sub) => {
+  const filtered = (subscriptions || []).filter((sub: any) => {
     const matchesSearch = sub.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     const matchesCategory = filterCategory === "all" || sub.category === filterCategory
     const matchesStatus = filterStatus === "all" || sub.status === filterStatus
     const matchesEmail = filterEmail === "all" || sub.email === filterEmail
 
     if (showDuplicatesOnly) {
-      const isDuplicate = (duplicates || []).some((dup) => dup.subscriptions.some((s) => s.id === sub.id))
+      const isDuplicate = (duplicates || []).some((dup: any) => dup.subscriptions.some((s: any) => s.id === sub.id))
       return matchesSearch && matchesCategory && matchesStatus && matchesEmail && isDuplicate
     }
 
     if (showUnusedOnly) {
-      const isUnused = (unusedSubscriptions || []).some((unused) => unused.id === sub.id)
+      const isUnused = (unusedSubscriptions || []).some((unused: any) => unused.id === sub.id)
       return matchesSearch && matchesCategory && matchesStatus && matchesEmail && isUnused
     }
 
@@ -71,7 +86,7 @@ export default function SubscriptionsPage({
     filtered.sort((a, b) => a.name.localeCompare(b.name))
   }
 
-  const totalCost = filtered.reduce((sum, sub) => sum + sub.price, 0)
+  const totalCost = filtered.reduce((sum: number, sub: any) => sum + sub.price, 0)
 
   const hasNoSubscriptions = !subscriptions || subscriptions.length === 0
   const hasNoResults = filtered.length === 0 && subscriptions && subscriptions.length > 0
@@ -127,7 +142,7 @@ export default function SubscriptionsPage({
         >
           <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-sm mb-2`}>Renewal Due</p>
           <h3 className={`text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-            {subscriptions.filter((s) => s.status === "expiring").length}
+            {subscriptions.filter((s: any) => s.status === "expiring").length}
           </h3>
           <p className={`text-xs ${darkMode ? "text-[#E86A33]" : "text-orange-600"} mt-2`}>Next 7 days</p>
         </div>
@@ -261,7 +276,7 @@ export default function SubscriptionsPage({
               items={filtered}
               itemHeight={80}
               containerHeight={600}
-              renderItem={(sub, index) => (
+              renderItem={(sub: any, index: number) => (
                 <SubscriptionCard
                   key={sub.id}
                   subscription={sub}
@@ -270,14 +285,14 @@ export default function SubscriptionsPage({
                   selectedSubscriptions={selectedSubscriptions}
                   onToggleSelect={onToggleSelect}
                   darkMode={darkMode}
-                  isDuplicate={duplicates.some((dup) => dup.subscriptions.some((s) => s.id === sub.id))}
-                  unusedInfo={unusedSubscriptions.find((unused) => unused.id === sub.id)}
+                  isDuplicate={duplicates.some((dup: any) => dup.subscriptions.some((s: any) => s.id === sub.id))}
+                  unusedInfo={unusedSubscriptions.find((unused: any) => unused.id === sub.id)}
                 />
               )}
             />
           ) : (
             <div className="space-y-3">
-              {filtered.map((sub) => (
+              {filtered.map((sub: any) => (
                 <SubscriptionCard
                   key={sub.id}
                   subscription={sub}
@@ -286,8 +301,8 @@ export default function SubscriptionsPage({
                   selectedSubscriptions={selectedSubscriptions}
                   onToggleSelect={onToggleSelect}
                   darkMode={darkMode}
-                  isDuplicate={duplicates.some((dup) => dup.subscriptions.some((s) => s.id === sub.id))}
-                  unusedInfo={unusedSubscriptions.find((unused) => unused.id === sub.id)}
+                  isDuplicate={duplicates.some((dup: any) => dup.subscriptions.some((s: any) => s.id === sub.id))}
+                  unusedInfo={unusedSubscriptions.find((unused: any) => unused.id === sub.id)}
                 />
               ))}
             </div>
@@ -318,6 +333,17 @@ export default function SubscriptionsPage({
   )
 }
 
+interface SubscriptionCardProps {
+  subscription: any
+  onDelete: (id: number) => void
+  onManage?: (subscription: any) => void
+  selectedSubscriptions: Set<number>
+  onToggleSelect: (id: number) => void
+  darkMode?: boolean
+  isDuplicate?: boolean
+  unusedInfo?: any
+}
+
 function SubscriptionCard({
   subscription: sub,
   onDelete,
@@ -327,7 +353,7 @@ function SubscriptionCard({
   darkMode,
   isDuplicate,
   unusedInfo,
-}) {
+}: SubscriptionCardProps) {
   return (
     <div
       className={`${darkMode ? "bg-[#2D3748] border-[#374151]" : "bg-white border-gray-200"} border rounded-xl p-5 flex items-center justify-between`}
@@ -379,7 +405,7 @@ function SubscriptionCard({
           </div>
           {sub.isTrial && sub.trialEndsAt && (
             <p className={`text-xs ${darkMode ? "text-[#007A5C]" : "text-green-600"} mt-1`}>
-              Trial ends in {Math.ceil((sub.trialEndsAt - new Date()) / (1000 * 60 * 60 * 24))} days - $
+              Trial ends in {Math.ceil((new Date(sub.trialEndsAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days - $
               {sub.priceAfterTrial}/month after
             </p>
           )}

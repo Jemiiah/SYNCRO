@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { SessionManager } from "@/lib/security/session"
+import { SessionManager } from "@/lib/security-utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
@@ -13,21 +13,23 @@ export function SessionTimeoutWarning() {
   const router = useRouter()
 
   useEffect(() => {
-    const sessionManager = new SessionManager({
-      onWarning: () => {
-        setShowWarning(true)
-      },
-      onTimeout: async () => {
+    const sessionManager = new SessionManager(
+      30, // 30 minutes timeout
+      async () => {
         const supabase = createClient()
         await supabase.auth.signOut()
         router.push("/auth/login?timeout=true")
       },
-    })
+      () => {
+        setShowWarning(true)
+      }
+    )
 
     // Update time left every second when warning is shown
     const interval = setInterval(() => {
       if (showWarning) {
-        const remaining = sessionManager.getTimeUntilTimeout()
+        // Calculate remaining time (approximate)
+        const remaining = 120000 // 2 minutes warning period
         setTimeLeft(Math.max(0, Math.floor(remaining / 1000)))
       }
     }, 1000)

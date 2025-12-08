@@ -17,6 +17,17 @@ const CANCEL_LINKS = {
   "Vercel Pro": "https://vercel.com/account/billing",
 }
 
+interface ManageSubscriptionModalProps {
+  subscription: any
+  onClose: () => void
+  onDelete: () => void
+  onEdit: () => void
+  onCancel: () => void
+  onPause: () => void
+  onResume: () => void
+  darkMode?: boolean
+}
+
 export default function ManageSubscriptionModal({
   subscription,
   onClose,
@@ -26,12 +37,12 @@ export default function ManageSubscriptionModal({
   onPause,
   onResume,
   darkMode,
-}) {
+}: ManageSubscriptionModalProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [showConfirmCancel, setShowConfirmCancel] = useState(false)
   const [showConfirmPause, setShowConfirmPause] = useState(false)
 
-  const cancelLink = CANCEL_LINKS[subscription.name] || subscription.renewalUrl
+  const cancelLink = (CANCEL_LINKS as Record<string, string>)[subscription.name] || subscription.renewalUrl
 
   const handleDelete = () => {
     onDelete()
@@ -40,21 +51,21 @@ export default function ManageSubscriptionModal({
 
   const handleCancel = () => {
     if (onCancel) {
-      onCancel(subscription.id)
+      onCancel()
     }
     onClose()
   }
 
   const handlePause = () => {
     if (onPause) {
-      onPause(subscription.id)
+      onPause()
     }
     onClose()
   }
 
   const handleResume = () => {
     if (onResume) {
-      onResume(subscription.id)
+      onResume()
     }
     onClose()
   }
@@ -150,7 +161,7 @@ export default function ManageSubscriptionModal({
             {subscription.tags && subscription.tags.length > 0 && (
               <div className="mt-4 flex items-center gap-2 flex-wrap">
                 <Tag className="w-4 h-4 text-gray-400" />
-                {subscription.tags.map((tag, idx) => (
+                {subscription.tags?.map((tag: string, idx: number) => (
                   <span
                     key={idx}
                     className={`px-2 py-1 text-xs rounded-full ${darkMode ? "bg-[#2D3748] text-gray-300" : "bg-white text-gray-700"}`}

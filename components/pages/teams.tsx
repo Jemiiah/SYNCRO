@@ -138,7 +138,7 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
   }
 
   const handleMemberLeave = (memberId: number) => {
-    const member = members.find((m) => m.id === memberId)
+    const member = members.find((m: any) => m.id === memberId)
     if (!member) return
 
     if (member.subscriptions.length === 0) {
@@ -148,7 +148,7 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
       )
 
       if (confirmDelete) {
-        setMembers(members.filter((m) => m.id !== memberId))
+        setMembers(members.filter((m: any) => m.id !== memberId))
       }
       return
     }
@@ -160,14 +160,14 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
 
     if (action) {
       // Archive member (mark as inactive)
-      setMembers(members.map((m) => (m.id === memberId ? { ...m, status: "inactive", leftAt: new Date() } : m)))
+      setMembers(members.map((m: any) => (m.id === memberId ? { ...m, status: "inactive", leftAt: new Date() } : m)))
     } else {
       // Transfer subscriptions to admin
-      const admin = members.find((m) => m.role === "Admin")
+      const admin = members.find((m: any) => m.role === "Admin")
       if (admin) {
         // In real implementation, would transfer subscriptions
         alert(`Subscriptions transferred to ${admin.name}`)
-        setMembers(members.filter((m) => m.id !== memberId))
+        setMembers(members.filter((m: any) => m.id !== memberId))
       }
     }
   }
@@ -176,7 +176,7 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
     const member = members.find((m) => m.id === id)
     if (!member) return
 
-    const adminCount = members.filter((m) => m.role === "Admin" && m.status === "active").length
+    const adminCount = members.filter((m: any) => m.role === "Admin" && m.status === "active").length
     if (member.role === "Admin" && adminCount === 1) {
       showToast({
         title: "Cannot remove last admin",
@@ -190,16 +190,16 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
   }
 
   const handleChangeRole = (memberId: number, newRole: string) => {
-    const member = members.find((m) => m.id === memberId)
+    const member = members.find((m: any) => m.id === memberId)
     if (!member) return
 
-    const adminCount = members.filter((m) => m.role === "Admin" && m.status === "active").length
+    const adminCount = members.filter((m: any) => m.role === "Admin" && m.status === "active").length
     if (member.role === "Admin" && newRole !== "Admin" && adminCount === 1) {
       alert("Cannot change role: You must have at least one admin in the team. Promote another member to admin first.")
       return
     }
 
-    setMembers(members.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)))
+    setMembers(members.map((m: any) => (m.id === memberId ? { ...m, role: newRole } : m)))
   }
 
   const getRoleBadgeColor = (role: string) => {
@@ -225,31 +225,31 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
         : "bg-gray-200 text-gray-600"
   }
 
-  const getFilteredEmailAccounts = (member) => {
+  const getFilteredEmailAccounts = (member: any) => {
     if (showWorkEmailsOnly) {
-      return member.emailAccounts.filter((acc) => acc.isWorkEmail)
+      return member.emailAccounts.filter((acc: any) => acc.isWorkEmail)
     }
     return member.emailAccounts
   }
 
-  const getFilteredSubscriptions = (member) => {
+  const getFilteredSubscriptions = (member: any) => {
     if (showWorkEmailsOnly) {
-      const workEmails = member.emailAccounts.filter((acc) => acc.isWorkEmail).map((acc) => acc.email)
-      return member.subscriptions.filter((sub) => workEmails.includes(sub.email))
+      const workEmails = member.emailAccounts.filter((acc: any) => acc.isWorkEmail).map((acc: any) => acc.email)
+      return member.subscriptions.filter((sub: any) => workEmails.includes(sub.email))
     }
     return member.subscriptions
   }
 
-  const totalUsage = members.reduce((sum, member) => {
+  const totalUsage = members.reduce((sum: number, member: any) => {
     const filteredSubs = getFilteredSubscriptions(member)
-    return sum + filteredSubs.reduce((subSum, sub) => subSum + sub.usage, 0)
+    return sum + filteredSubs.reduce((subSum: number, sub: any) => subSum + sub.usage, 0)
   }, 0)
 
-  const totalEmailAccounts = members.reduce((sum, member) => sum + getFilteredEmailAccounts(member).length, 0)
+  const totalEmailAccounts = members.reduce((sum: number, member: any) => sum + getFilteredEmailAccounts(member).length, 0)
 
   const getDepartmentSpending = () => {
-    const spending = {}
-    members.forEach((member) => {
+    const spending: Record<string, number> = {}
+    members.forEach((member: any) => {
       if (!spending[member.department]) {
         spending[member.department] = 0
       }
@@ -603,7 +603,7 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
       {activeTab === "emails" && (
         <div className="space-y-4">
           {members
-            .filter((m) => getFilteredEmailAccounts(m).length > 0)
+            .filter((m: any) => getFilteredEmailAccounts(m).length > 0)
             .map((member) => (
               <div
                 key={member.id}
@@ -630,8 +630,8 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
                 </div>
 
                 <div className="space-y-3">
-                  {getFilteredEmailAccounts(member).map((emailAccount, idx) => {
-                    const emailSubs = member.subscriptions.filter((sub) => sub.email === emailAccount.email)
+                  {getFilteredEmailAccounts(member).map((emailAccount: any, idx: number) => {
+                    const emailSubs = member.subscriptions.filter((sub: any) => sub.email === emailAccount.email)
                     const emailSpend = emailSubs.length * 20
                     return (
                       <div
@@ -700,7 +700,7 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
       {activeTab === "usage" && (
         <div className="space-y-6">
           {members
-            .filter((m) => m.status === "active")
+            .filter((m: any) => m.status === "active")
             .map((member) => {
               const filteredSubs = getFilteredSubscriptions(member)
               if (filteredSubs.length === 0 && showWorkEmailsOnly) return null
@@ -727,14 +727,14 @@ export default function TeamsPage({ workspace, subscriptions, darkMode, emailAcc
                         {showWorkEmailsOnly ? "Work Email Usage" : "Total Usage"}
                       </p>
                       <p className={`text-xl font-bold ${darkMode ? "text-white" : "text-[#1E2A35]"}`}>
-                        {filteredSubs.reduce((sum, sub) => sum + sub.usage, 0).toLocaleString()}
+                        {filteredSubs.reduce((sum: number, sub: any) => sum + sub.usage, 0).toLocaleString()}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    {filteredSubs.map((sub, idx) => {
-                      const emailAccount = member.emailAccounts.find((acc) => acc.email === sub.email)
+                    {filteredSubs.map((sub: any, idx: number) => {
+                      const emailAccount = member.emailAccounts.find((acc: any) => acc.email === sub.email)
                       return (
                         <div
                           key={idx}

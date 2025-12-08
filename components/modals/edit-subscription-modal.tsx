@@ -4,7 +4,14 @@ import { useState } from "react"
 import { X, DollarSign, Calendar, Tag, AlertCircle } from "lucide-react"
 import { validateSubscriptionData } from "@/lib/validation"
 
-export default function EditSubscriptionModal({ subscription, onSave, onClose, darkMode }) {
+interface EditSubscriptionModalProps {
+  subscription: any
+  onSave: (updates: any) => void
+  onClose: () => void
+  darkMode?: boolean
+}
+
+export default function EditSubscriptionModal({ subscription, onSave, onClose, darkMode }: EditSubscriptionModalProps) {
   const [formData, setFormData] = useState({
     name: subscription.name,
     price: subscription.price,
@@ -15,9 +22,9 @@ export default function EditSubscriptionModal({ subscription, onSave, onClose, d
     renewalUrl: subscription.renewalUrl || "",
   })
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const validation = validateSubscriptionData(formData)
@@ -29,8 +36,8 @@ export default function EditSubscriptionModal({ subscription, onSave, onClose, d
     // Convert tags string to array
     const tagsArray = formData.tags
       .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t)
+      .map((t: string) => t.trim())
+      .filter((t: string) => t.length > 0)
 
     onSave({
       ...formData,

@@ -16,6 +16,18 @@ import {
 import { useState } from "react"
 import { type Currency, CURRENCY_NAMES, CURRENCY_SYMBOLS } from "@/lib/currency-utils"
 
+interface SettingsPageProps {
+  currentPlan: string
+  onUpgrade: (plan: string) => void
+  budgetLimit: number
+  onBudgetChange: (limit: number) => void
+  darkMode?: boolean
+  currency: Currency
+  onCurrencyChange: (currency: Currency) => void
+  accountType?: string
+  onUpgradeToTeam?: (workspaceData: any) => void
+}
+
 export default function SettingsPage({
   currentPlan,
   onUpgrade,
@@ -26,7 +38,7 @@ export default function SettingsPage({
   onCurrencyChange,
   accountType = "individual",
   onUpgradeToTeam,
-}) {
+}: SettingsPageProps) {
   const [alertThreshold, setAlertThreshold] = useState(80)
   const [emailAlerts, setEmailAlerts] = useState(true)
   const [weeklyReports, setWeeklyReports] = useState(true)
@@ -88,11 +100,11 @@ export default function SettingsPage({
     }
   }
 
-  const handleDeleteApiKey = (id) => {
+  const handleDeleteApiKey = (id: number) => {
     setApiKeys(apiKeys.filter((k) => k.id !== id))
   }
 
-  const toggleKeyVisibility = (id) => {
+  const toggleKeyVisibility = (id: number) => {
     setApiKeys(apiKeys.map((k) => (k.id === id ? { ...k, visible: !k.visible } : k)))
   }
 
@@ -123,7 +135,7 @@ export default function SettingsPage({
     }, 1000)
   }
 
-  const handleSetPrimaryEmail = (id) => {
+  const handleSetPrimaryEmail = (id: number) => {
     const newPrimary = emailAccounts.find((e) => e.id === id)
 
     if (!newPrimary) return
@@ -137,7 +149,7 @@ export default function SettingsPage({
     setEmailAccounts(emailAccounts.map((e) => ({ ...e, isPrimary: e.id === id })))
   }
 
-  const handleRemoveEmail = (id) => {
+  const handleRemoveEmail = (id: number) => {
     const email = emailAccounts.find((e) => e.id === id)
 
     if (!email) return
@@ -163,7 +175,7 @@ export default function SettingsPage({
     setEmailAccounts(emailAccounts.filter((e) => e.id !== id))
   }
 
-  const handleRescanEmail = (id) => {
+  const handleRescanEmail = (id: number) => {
     console.log("[v0] Rescanning email account:", id)
     setEmailAccounts(emailAccounts.map((e) => (e.id === id ? { ...e, lastScanned: "Just now" } : e)))
   }
@@ -192,14 +204,14 @@ export default function SettingsPage({
     })
   }
 
-  const handleRemoveInviteEmail = (index) => {
+  const handleRemoveInviteEmail = (index: number) => {
     setTeamSetup({
       ...teamSetup,
       inviteEmails: teamSetup.inviteEmails.filter((_, i) => i !== index),
     })
   }
 
-  const handleInviteEmailChange = (index, value) => {
+  const handleInviteEmailChange = (index: number, value: string) => {
     const newInvites = [...teamSetup.inviteEmails]
     newInvites[index] = value
     setTeamSetup({
@@ -228,7 +240,7 @@ export default function SettingsPage({
           <div className="flex flex-col gap-2">
             {currentPlan === "free" && (
               <button
-                onClick={onUpgrade}
+                onClick={() => onUpgrade("pro")}
                 className={`px-6 py-2 rounded-lg font-medium transition-colors ${
                   darkMode ? "bg-white text-black hover:bg-gray-100" : "bg-black text-white hover:bg-gray-800"
                 }`}
