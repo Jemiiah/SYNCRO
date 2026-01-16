@@ -1,7 +1,7 @@
-**Self-Custodial Subscription Manager**
+## Self-Custodial Subscription Manager**
 A decentralized subscription management platform that enables users to control recurring payments directly from their own wallet. Users can track, approve, pause, and fund subscriptions like Netflix, YouTube, Claude, Midjourney, and more, without giving control of their payment method to any centralized service. Payments are executed via a crypto-card-funded agent to handle Web2 billing.
 
-**✨ Key Features**
+## ✨ Key Features**
 Full self-custody: users maintain complete control of funds
 Unified dashboard for managing all subscriptions
 AI-powered agent to automate payment approvals and execution
@@ -10,7 +10,7 @@ Price-change protection with spending caps
 Push notifications for approvals and reminders
 Manual subscription entry for unsupported platforms
 
-🧠 High-Level Workflow
+## High-Level Workflow
 User connects a Web3 wallet.
 User adds subscriptions (auto-detected or manually entered).
 User funds a Subscription Vault with USDC or stablecoins.
