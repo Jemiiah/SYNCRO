@@ -10,7 +10,20 @@ pub enum Error {
     AlreadyInitialized = 1,
     NotInitialized = 2,
     Unauthorized = 3,
+    InvalidScope = 4,
 }
+
+
+#[contracttype]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum Scope {
+    Renewals = 1 << 0,
+    GiftCards = 1 << 1,
+    Approvals = 1 << 2,
+}
+
+
 
 #[contracttype]
 #[derive(Clone)]
@@ -33,14 +46,21 @@ impl AgentRegistry {
         Ok(())
     }
 
-    /// Register a new agent. Admin only.
-    pub fn register(env: Env, agent: Address) -> Result<(), Error> {
+    fn require_admin(env: &Env) -> Result<Address, Error> {
         let admin: Address = env
             .storage()
             .instance()
             .get(&DataKey::Admin)
             .ok_or(Error::NotInitialized)?;
+
         admin.require_auth();
+        Ok(admin)
+    }
+
+
+    /// Register a new agent. Admin only.
+    pub fn register(env: Env, agent: Address) -> Result<(), Error> {
+        Self::require_admin(&env)?;
 
         env.storage()
             .persistent()
@@ -52,14 +72,33 @@ impl AgentRegistry {
         Ok(())
     }
 
+    pub fn update_scopes(
+        env: Env,
+        agent: Address,
+        scopes: u32,
+    ) -> Result<(), Error> {
+        Self::require_admin(&env)?;
+
+        if !env.storage().persistent().has(&DataKey::Agent(agent.clone())) {
+            return Err(Error::Unauthorized);
+        }
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Agent(agent.clone()), &scopes);
+
+        env.events().publish(
+            (symbol_short!("agent"), symbol_short!("scopes")),
+            (agent, scopes),
+        );
+
+        Ok(())
+    }
+    
+
     /// Revoke an agent's authorization. Admin only.
     pub fn revoke(env: Env, agent: Address) -> Result<(), Error> {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .ok_or(Error::NotInitialized)?;
-        admin.require_auth();
+        Self::require_admin(&env)?;
 
         env.storage()
             .persistent()
