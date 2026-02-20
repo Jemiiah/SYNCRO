@@ -29,7 +29,7 @@ export class EventListener {
   constructor() {
     this.contractId = process.env.SOROBAN_CONTRACT_ADDRESS || '';
     this.rpcUrl = process.env.STELLAR_NETWORK_URL || 'https://soroban-testnet.stellar.org';
-    
+
     if (!this.contractId) {
       throw new Error('SOROBAN_CONTRACT_ADDRESS not configured');
     }
@@ -37,11 +37,11 @@ export class EventListener {
 
   async start() {
     if (this.isRunning) return;
-    
+
     this.isRunning = true;
     this.lastProcessedLedger = await this.getLastProcessedLedger();
     logger.info('Event listener started', { lastLedger: this.lastProcessedLedger });
-    
+
     this.poll();
   }
 
@@ -63,19 +63,19 @@ export class EventListener {
 
   private async fetchAndProcessEvents() {
     const currentLedger = await this.getCurrentLedger();
-    
+
     // Check for reorg
     if (currentLedger < this.lastProcessedLedger) {
       await reorgHandler.handleReorg(currentLedger, this.lastProcessedLedger);
       this.lastProcessedLedger = await this.getLastProcessedLedger();
     }
-    
+
     const events = await this.fetchEvents(this.lastProcessedLedger + 1);
-    
+
     if (events.length === 0) return;
 
     const processed = await this.processEvents(events);
-    
+
     if (processed.length > 0) {
       await this.saveEvents(processed);
       this.lastProcessedLedger = Math.max(...events.map(e => e.ledger));
@@ -99,7 +99,7 @@ export class EventListener {
     });
 
     const data = await response.json();
-    return data.result?.events || [];
+    return (data as any).result?.events || [];
   }
 
   private async processEvents(events: ContractEvent[]): Promise<ProcessedEvent[]> {
@@ -130,10 +130,10 @@ export class EventListener {
 
   private async handleRenewalSuccess(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id } = event.value;
-    
+
     await supabase
       .from('subscriptions')
-      .update({ 
+      .update({
         status: 'active',
         last_payment_date: new Date().toISOString(),
         failure_count: 0,
@@ -151,10 +151,10 @@ export class EventListener {
 
   private async handleRenewalFailed(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id, failure_count } = event.value;
-    
+
     await supabase
       .from('subscriptions')
-      .update({ 
+      .update({
         status: 'retrying',
         failure_count,
       })
@@ -171,7 +171,7 @@ export class EventListener {
 
   private async handleStateTransition(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id, new_state } = event.value;
-    
+
     const statusMap: Record<string, string> = {
       Active: 'active',
       Retrying: 'retrying',
@@ -194,7 +194,7 @@ export class EventListener {
 
   private async handleApprovalCreated(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id, approval_id, max_spend, expires_at } = event.value;
-    
+
     await supabase
       .from('renewal_approvals')
       .insert({
@@ -216,10 +216,10 @@ export class EventListener {
 
   private async handleApprovalRejected(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id, approval_id, reason } = event.value;
-    
+
     await supabase
       .from('renewal_approvals')
-      .update({ 
+      .update({
         rejected: true,
         rejection_reason: reason,
       })
@@ -278,7 +278,7 @@ export class EventListener {
     });
 
     const data = await response.json();
-    return data.result?.sequence || 0;
+    return (data as any).result?.sequence || 0;
   }
 
   private sleep(ms: number): Promise<void> {

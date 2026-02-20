@@ -51,7 +51,7 @@ router.get('/:id', validateSubscriptionOwnership, async (req: AuthenticatedReque
   try {
     const subscription = await subscriptionService.getSubscription(
       req.user!.id,
-      req.params.id
+      req.params.id as string
     );
 
     res.json({
@@ -109,8 +109,7 @@ router.post('/', async (req: AuthenticatedRequest, res: Response) => {
     // Create subscription
     const result = await subscriptionService.createSubscription(
       req.user!.id,
-      req.body,
-      idempotencyKey
+      req.body
     );
 
     const responseBody = {
@@ -174,7 +173,7 @@ router.patch('/:id', validateSubscriptionOwnership, async (req: AuthenticatedReq
 
     const result = await subscriptionService.updateSubscription(
       req.user!.id,
-      req.params.id,
+      req.params.id as string,
       req.body,
       expectedVersion ? parseInt(expectedVersion) : undefined
     );
@@ -221,7 +220,7 @@ router.delete('/:id', validateSubscriptionOwnership, async (req: AuthenticatedRe
   try {
     const result = await subscriptionService.deleteSubscription(
       req.user!.id,
-      req.params.id
+      req.params.id as string
     );
 
     const responseBody = {
@@ -255,7 +254,7 @@ router.post('/:id/retry-sync', validateSubscriptionOwnership, async (req: Authen
   try {
     const result = await subscriptionService.retryBlockchainSync(
       req.user!.id,
-      req.params.id
+      req.params.id as string
     );
 
     res.json({

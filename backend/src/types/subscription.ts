@@ -2,6 +2,7 @@ export interface Subscription {
   id: string;
   user_id: string;
   email_account_id: string | null;
+  merchant_id: string | null;
   name: string;
   provider: string;
   price: number;
@@ -21,6 +22,7 @@ export interface Subscription {
 export interface SubscriptionCreateInput {
   name: string;
   provider?: string;
+  merchant_id?: string;
   price: number;
   billing_cycle: 'monthly' | 'yearly' | 'quarterly';
   status?: 'active' | 'cancelled' | 'paused' | 'trial';
@@ -37,6 +39,7 @@ export interface SubscriptionCreateInput {
 export interface SubscriptionUpdateInput {
   name?: string;
   provider?: string;
+  merchant_id?: string;
   price?: number;
   billing_cycle?: 'monthly' | 'yearly' | 'quarterly';
   status?: 'active' | 'cancelled' | 'paused' | 'trial';
