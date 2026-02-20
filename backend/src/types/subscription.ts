@@ -16,6 +16,7 @@ export interface Subscription {
   tags: string[];
   created_at: string;
   updated_at: string;
+  last_renewal_cycle_id?: number | null;
 }
 
 export interface SubscriptionCreateInput {

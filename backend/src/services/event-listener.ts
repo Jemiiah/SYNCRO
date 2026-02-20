@@ -1,6 +1,7 @@
 import logger from '../config/logger';
 import { supabase } from '../config/database';
 import { reorgHandler } from './reorg-handler';
+import { generateCycleId } from '../utils/cycle-id';
 
 interface ContractEvent {
   type: string;
@@ -98,7 +99,7 @@ export class EventListener {
       }),
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data.result?.events || [];
   }
 
@@ -123,6 +124,7 @@ export class EventListener {
       StateTransition: this.handleStateTransition.bind(this),
       ApprovalCreated: this.handleApprovalCreated.bind(this),
       ApprovalRejected: this.handleApprovalRejected.bind(this),
+      DuplicateRenewalRejected: this.handleDuplicateRenewalRejected.bind(this),
     };
 
     return handlers[eventType];
@@ -130,14 +132,27 @@ export class EventListener {
 
   private async handleRenewalSuccess(event: ContractEvent): Promise<ProcessedEvent | null> {
     const { sub_id } = event.value;
-    
+
+    // Fetch the subscription to get next_billing_date for cycle_id
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('next_billing_date')
+      .eq('blockchain_sub_id', sub_id)
+      .single();
+
+    const updateData: Record<string, any> = {
+      status: 'active',
+      last_payment_date: new Date().toISOString(),
+      failure_count: 0,
+    };
+
+    if (sub?.next_billing_date) {
+      updateData.last_renewal_cycle_id = generateCycleId(sub.next_billing_date);
+    }
+
     await supabase
       .from('subscriptions')
-      .update({ 
-        status: 'active',
-        last_payment_date: new Date().toISOString(),
-        failure_count: 0,
-      })
+      .update(updateData)
       .eq('blockchain_sub_id', sub_id);
 
     return {
@@ -235,6 +250,20 @@ export class EventListener {
     };
   }
 
+  private async handleDuplicateRenewalRejected(event: ContractEvent): Promise<ProcessedEvent | null> {
+    const { sub_id, cycle_id } = event.value;
+
+    logger.warn('Duplicate renewal rejected by contract', { sub_id, cycle_id });
+
+    return {
+      sub_id,
+      event_type: 'duplicate_renewal_rejected',
+      ledger: event.ledger,
+      tx_hash: event.txHash,
+      event_data: event.value,
+    };
+  }
+
   private async saveEvents(events: ProcessedEvent[]) {
     const { error } = await supabase
       .from('contract_events')
@@ -277,7 +306,7 @@ export class EventListener {
       }),
     });
 
-    const data = await response.json();
+    const data: any = await response.json();
     return data.result?.sequence || 0;
   }
 
